@@ -8,15 +8,28 @@ import time
 
 
 def main():
-    test_percentage = 0.2
-    test_sentence = "The dog runs."
+    test_percentage = 0.3
+    # Nhập câu từ người dùng
+    test_sentence = input("Nhập câu để gán nhãn: ")
 
     # Khởi tạo các tagger
     taggers = {
-        "MostFreqPOStagger": MostFreqPOSTagger(),
-        "ViterbiPOStagger": ViterbiPOSTagger(),
-        "CRFPOStagger": CRFPOSTagger(),
-        "MEMMPOStagger": MEMMPOSTagger()
+        "MostFreqPOSTagger": {
+            "tagger": MostFreqPOSTagger(),
+            "complexity": "Huấn luyện: O(N_w), Gán nhãn: O(L)"
+        },
+        "ViterbiPOSTagger": {
+            "tagger": ViterbiPOSTagger(),
+            "complexity": "Huấn luyện: O(N_t), Gán nhãn: O(L * T^2)"
+        },
+        "CRFPOSTagger": {
+            "tagger": CRFPOSTagger(),
+            "complexity": "Huấn luyện: O(N_t * T^2 * I), Gán nhãn: O(L * T^2)"
+        },
+        "MEMMPOSTagger": {
+            "tagger": MEMMPOSTagger(),
+            "complexity": "Huấn luyện: O(N_t * F * D), Gán nhãn: O(L * F)"
+        }
     }
 
     # Chia dữ liệu
@@ -27,7 +40,9 @@ def main():
     test_sents = tagged_sents[-test_size:]
 
     # Huấn luyện và đánh giá
-    for name, tagger in taggers.items():
+    for name, info in taggers.items():
+        tagger = info["tagger"]
+        complexity = info["complexity"]
         print(f"\nĐang huấn luyện {name}...")
 
         # Đo thời gian huấn luyện
@@ -42,15 +57,19 @@ def main():
         start_tag = time.time()
         tagged = tagger.tag(test_sentence)
         tag_time = time.time() - start_tag
-        print(f"Kết quả gán nhãn ({name}): {tagged}")
+        print(f"Kết quả gán nhãn: {tagged}")
 
         # Đánh giá độ chính xác
         accuracy = evaluate_tagger(tagger, test_sents)
+        error_rate = 1 - accuracy
 
         # Hiển thị hiệu suất
-        print(f"Độ chính xác trên tập kiểm tra ({name}): {accuracy:.4f}")
-        print(f"Thời gian huấn luyện ({name}): {train_time:.2f} giây")
-        print(f"Thời gian gán nhãn ({name}): {tag_time:.4f} giây")
+        print(f"Độ chính xác trên tập kiểm tra: {accuracy:.4f}")
+        print(f"Tỷ lệ lỗi: {error_rate:.4f}")
+        print(f"Thời gian huấn luyện: {train_time:.2f} giây")
+        print(f"Thời gian gán nhãn: {tag_time:.4f} giây")
+        print(f"Độ phức tạp tính toán: {complexity}")
+        print(f"Trong đó: N_w = số từ, N_t = số token, L = độ dài câu, T = số nhãn, I = số vòng lặp, F = số đặc trưng, D = độ sâu cây")
 
 
 if __name__ == "__main__":

@@ -68,7 +68,7 @@ class CRFPOSTagger:
         trainer.set_params({
             'c1': 0.1,  # Giảm L1 regularization
             'c2': 0.01,  # Giảm L2 regularization
-            'max_iterations': 100,  # Tăng số lần lặp
+            'max_iterations': 200,  # Tăng số lần lặp
             'feature.possible_transitions': True
         })
         for xseq, yseq in zip(X_train, y_train):
